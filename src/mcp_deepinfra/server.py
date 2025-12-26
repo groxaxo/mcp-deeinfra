@@ -29,16 +29,16 @@ else:
     ENABLED_TOOLS = [tool.strip() for tool in ENABLED_TOOLS_STR.split(",")]
 
 DEFAULT_MODELS = {
-    "generate_image": os.getenv("MODEL_GENERATE_IMAGE", "Bria/Bria-3.2"),
-    "text_generation": os.getenv("MODEL_TEXT_GENERATION", "meta-llama/Llama-2-7b-chat-hf"),
-    "embeddings": os.getenv("MODEL_EMBEDDINGS", "sentence-transformers/all-MiniLM-L6-v2"),
+    "generate_image": os.getenv("MODEL_GENERATE_IMAGE", "black-forest-labs/FLUX-1-dev"),
+    "text_generation": os.getenv("MODEL_TEXT_GENERATION", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
+    "embeddings": os.getenv("MODEL_EMBEDDINGS", "BAAI/bge-large-en-v1.5"),
     "speech_recognition": os.getenv("MODEL_SPEECH_RECOGNITION", "openai/whisper-large-v3"),
-    "zero_shot_image_classification": os.getenv("MODEL_ZERO_SHOT_IMAGE_CLASSIFICATION", "openai/gpt-4o-mini"),
-    "object_detection": os.getenv("MODEL_OBJECT_DETECTION", "openai/gpt-4o-mini"),
-    "image_classification": os.getenv("MODEL_IMAGE_CLASSIFICATION", "openai/gpt-4o-mini"),
-    "text_classification": os.getenv("MODEL_TEXT_CLASSIFICATION", "microsoft/DialoGPT-medium"),
-    "token_classification": os.getenv("MODEL_TOKEN_CLASSIFICATION", "microsoft/DialoGPT-medium"),
-    "fill_mask": os.getenv("MODEL_FILL_MASK", "microsoft/DialoGPT-medium"),
+    "zero_shot_image_classification": os.getenv("MODEL_ZERO_SHOT_IMAGE_CLASSIFICATION", "meta-llama/Llama-3.2-90B-Vision-Instruct"),
+    "object_detection": os.getenv("MODEL_OBJECT_DETECTION", "meta-llama/Llama-3.2-90B-Vision-Instruct"),
+    "image_classification": os.getenv("MODEL_IMAGE_CLASSIFICATION", "meta-llama/Llama-3.2-90B-Vision-Instruct"),
+    "text_classification": os.getenv("MODEL_TEXT_CLASSIFICATION", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
+    "token_classification": os.getenv("MODEL_TOKEN_CLASSIFICATION", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
+    "fill_mask": os.getenv("MODEL_FILL_MASK", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
 }
 
 
@@ -67,14 +67,19 @@ if "all" in ENABLED_TOOLS or "text_generation" in ENABLED_TOOLS:
         """Generate text completion using DeepInfra OpenAI-compatible API."""
         model = DEFAULT_MODELS["text_generation"]
         try:
-            response = await client.completions.create(
+            response = await client.chat.completions.create(
                 model=model,
-                prompt=prompt,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
                 max_tokens=256,
                 temperature=0.7,
             )
             if response.choices:
-                return response.choices[0].text
+                return response.choices[0].message.content
             else:
                 return "No text generated"
         except Exception as e:
@@ -218,20 +223,24 @@ if "all" in ENABLED_TOOLS or "text_classification" in ENABLED_TOOLS:
     async def text_classification(text: str) -> str:
         """Classify text using DeepInfra OpenAI-compatible API."""
         model = DEFAULT_MODELS["text_classification"]
-        prompt = f"""Analyze the following text and classify it. Determine the sentiment (positive, negative, neutral) and main category/topic. Provide your analysis in JSON format with 'sentiment' and 'category' fields.
+        try:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"""Analyze the following text and classify it. Determine the sentiment (positive, negative, neutral) and main category/topic. Provide your analysis in JSON format with 'sentiment' and 'category' fields.
 
 Text: {text}
 
 Response format: {{"sentiment": "positive/negative/neutral", "category": "topic"}}"""
-        try:
-            response = await client.completions.create(
-                model=model,
-                prompt=prompt,
+                    }
+                ],
                 max_tokens=200,
                 temperature=0.1,
             )
             if response.choices:
-                return response.choices[0].text
+                return response.choices[0].message.content
             else:
                 return "Unable to classify text"
         except Exception as e:
@@ -242,20 +251,24 @@ if "all" in ENABLED_TOOLS or "token_classification" in ENABLED_TOOLS:
     async def token_classification(text: str) -> str:
         """Perform token classification (NER) using DeepInfra OpenAI-compatible API."""
         model = DEFAULT_MODELS["token_classification"]
-        prompt = f"""Perform named entity recognition on the following text. Identify all named entities (persons, organizations, locations, dates, etc.) and classify them. Provide your analysis in JSON format with an array of entities, each having 'entity', 'type', and 'position' fields.
+        try:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"""Perform named entity recognition on the following text. Identify all named entities (persons, organizations, locations, dates, etc.) and classify them. Provide your analysis in JSON format with an array of entities, each having 'entity', 'type', and 'position' fields.
 
 Text: {text}
 
 Response format: {{"entities": [{{"entity": "entity_name", "type": "PERSON/ORG/LOC/DATE/etc", "position": [start, end]}}]}}"""
-        try:
-            response = await client.completions.create(
-                model=model,
-                prompt=prompt,
+                    }
+                ],
                 max_tokens=500,
                 temperature=0.1,
             )
             if response.choices:
-                return response.choices[0].text
+                return response.choices[0].message.content
             else:
                 return "Unable to perform token classification"
         except Exception as e:
@@ -266,20 +279,24 @@ if "all" in ENABLED_TOOLS or "fill_mask" in ENABLED_TOOLS:
     async def fill_mask(text: str) -> str:
         """Fill masked tokens in text using DeepInfra OpenAI-compatible API."""
         model = DEFAULT_MODELS["fill_mask"]
-        prompt = f"""Fill in the [MASK] token in the following text with the most appropriate word. Provide the completed sentence and explain your choice.
+        try:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"""Fill in the [MASK] token in the following text with the most appropriate word. Provide the completed sentence and explain your choice.
 
 Text: {text}
 
 Response format: {{"filled_text": "completed sentence", "chosen_word": "word", "explanation": "reasoning"}}"""
-        try:
-            response = await client.completions.create(
-                model=model,
-                prompt=prompt,
+                    }
+                ],
                 max_tokens=200,
                 temperature=0.1,
             )
             if response.choices:
-                return response.choices[0].text
+                return response.choices[0].message.content
             else:
                 return "Unable to fill mask"
         except Exception as e:
