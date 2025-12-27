@@ -104,11 +104,12 @@ if "all" in ENABLED_TOOLS or "list_models" in ENABLED_TOOLS:
         """
         try:
             models, was_cached = await get_available_models(force_refresh)
+            cache_age = int(time.time() - _models_cache_timestamp) if _models_cache_timestamp and was_cached else 0
             return json.dumps({
                 "models": models,
                 "count": len(models),
                 "cached": was_cached,
-                "cache_age_seconds": int(time.time() - _models_cache_timestamp) if _models_cache_timestamp else 0
+                "cache_age_seconds": cache_age
             }, indent=2)
         except Exception as e:
             return f"Error fetching models: {type(e).__name__}: {str(e)}"
