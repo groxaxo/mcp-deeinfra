@@ -24,15 +24,16 @@ mcp-deepinfra/
 ├── src/
 │   └── mcp_deepinfra/
 │       ├── __init__.py      # Package initialization
-│       └── server.py        # Main MCP server implementation
+│       └── server.py        # Main MCP server implementation with dynamic model discovery
 ├── tests/
 │   ├── conftest.py          # Pytest fixtures and configuration
-│   ├── test_server.py      # Server initialization tests
-│   └── test_tools.py        # Individual tool tests
+│   ├── test_server.py       # Server initialization tests
+│   └── test_tools.py        # Individual tool tests (including list_models)
 ├── pyproject.toml           # Project configuration and dependencies
 ├── uv.lock                  # Lock file for uv package manager
 ├── run_tests.sh             # Convenience script for running tests
-└── README.md               # This file
+├── MODELS.md                # Detailed documentation on dynamic model support
+└── README.md                # This file
 ```
 
 ## Setup
@@ -159,6 +160,8 @@ list_models(force_refresh=True)
 ```
 
 All tools can leverage any compatible model from DeepInfra's extensive catalog by setting the appropriate environment variables.
+
+For detailed information about model discovery and usage, see [MODELS.md](MODELS.md).
 
 ## Testing
 
