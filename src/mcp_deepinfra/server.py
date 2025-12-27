@@ -105,7 +105,8 @@ if "all" in ENABLED_TOOLS or "list_models" in ENABLED_TOOLS:
         """
         try:
             models, was_cached = await get_available_models(force_refresh)
-            cache_age = int(time.time() - _models_cache_timestamp) if _models_cache_timestamp and was_cached else 0
+            # Cache age is only meaningful when data comes from cache
+            cache_age = int(time.time() - _models_cache_timestamp) if (was_cached and _models_cache_timestamp) else 0
             return json.dumps({
                 "models": models,
                 "count": len(models),
