@@ -61,7 +61,7 @@ The tool returns a JSON object with the following structure:
   - `created`: Unix timestamp when model was added
   - `owned_by`: Model owner/provider
 - **count**: Total number of available models
-- **cached**: Whether this response came from cache
+- **cached**: Whether this response actually came from cache (accounts for fallback scenarios)
 - **cache_age_seconds**: Age of cached data (0 if fresh)
 
 ## Caching Mechanism

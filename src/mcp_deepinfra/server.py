@@ -48,8 +48,12 @@ DEFAULT_MODELS = {
 }
 
 
-async def get_available_models(force_refresh: bool = False) -> list[dict]:
-    """Fetch available models from DeepInfra API with caching."""
+async def get_available_models(force_refresh: bool = False) -> tuple[list[dict], bool]:
+    """Fetch available models from DeepInfra API with caching.
+    
+    Returns:
+        Tuple of (models_list, was_cached) where was_cached indicates if data came from cache.
+    """
     global _models_cache, _models_cache_timestamp
     
     # Check if cache is valid
@@ -58,7 +62,7 @@ async def get_available_models(force_refresh: bool = False) -> list[dict]:
         _models_cache is not None and 
         _models_cache_timestamp is not None and
         (current_time - _models_cache_timestamp) < _models_cache_ttl):
-        return _models_cache
+        return _models_cache, True
     
     # Fetch fresh models list
     try:
@@ -75,36 +79,37 @@ async def get_available_models(force_refresh: bool = False) -> list[dict]:
         _models_cache = models_list
         _models_cache_timestamp = current_time
         
-        return models_list
+        return models_list, False
     except Exception as e:
         # If fetch fails and we have cache, return cache
         if _models_cache is not None:
-            return _models_cache
+            return _models_cache, True
         # Otherwise, return empty list
-        return []
+        return [], False
 
 
-@app.tool()
-async def list_models(force_refresh: bool = False) -> str:
-    """
-    List all available models from DeepInfra API in real-time.
-    
-    Args:
-        force_refresh: If True, bypass cache and fetch fresh model list. Default is False.
-    
-    Returns:
-        JSON string containing list of available models with their IDs and metadata.
-    """
-    try:
-        models = await get_available_models(force_refresh)
-        return json.dumps({
-            "models": models,
-            "count": len(models),
-            "cached": not force_refresh and _models_cache_timestamp is not None,
-            "cache_age_seconds": int(time.time() - _models_cache_timestamp) if _models_cache_timestamp else 0
-        }, indent=2)
-    except Exception as e:
-        return f"Error fetching models: {type(e).__name__}: {str(e)}"
+if "all" in ENABLED_TOOLS or "list_models" in ENABLED_TOOLS:
+    @app.tool()
+    async def list_models(force_refresh: bool = False) -> str:
+        """
+        List all available models from DeepInfra API in real-time.
+        
+        Args:
+            force_refresh: If True, bypass cache and fetch fresh model list. Default is False.
+        
+        Returns:
+            JSON string containing list of available models with their IDs and metadata.
+        """
+        try:
+            models, was_cached = await get_available_models(force_refresh)
+            return json.dumps({
+                "models": models,
+                "count": len(models),
+                "cached": was_cached,
+                "cache_age_seconds": int(time.time() - _models_cache_timestamp) if _models_cache_timestamp else 0
+            }, indent=2)
+        except Exception as e:
+            return f"Error fetching models: {type(e).__name__}: {str(e)}"
 
 
 
