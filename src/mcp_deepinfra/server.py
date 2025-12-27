@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import json
 from openai import AsyncOpenAI
+import time
 
 load_dotenv()
 
@@ -20,6 +21,11 @@ client = AsyncOpenAI(
     api_key=DEEPINFRA_API_KEY,
     base_url="https://api.deepinfra.com/v1/openai"
 )
+
+# Cache for models list
+_models_cache = None
+_models_cache_timestamp = None
+_models_cache_ttl = 3600  # 1 hour cache TTL
 
 # Configuration
 ENABLED_TOOLS_STR = os.getenv("ENABLED_TOOLS", "all")
@@ -40,6 +46,65 @@ DEFAULT_MODELS = {
     "token_classification": os.getenv("MODEL_TOKEN_CLASSIFICATION", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
     "fill_mask": os.getenv("MODEL_FILL_MASK", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
 }
+
+
+async def get_available_models(force_refresh: bool = False) -> list[dict]:
+    """Fetch available models from DeepInfra API with caching."""
+    global _models_cache, _models_cache_timestamp
+    
+    # Check if cache is valid
+    current_time = time.time()
+    if (not force_refresh and 
+        _models_cache is not None and 
+        _models_cache_timestamp is not None and
+        (current_time - _models_cache_timestamp) < _models_cache_ttl):
+        return _models_cache
+    
+    # Fetch fresh models list
+    try:
+        models_response = await client.models.list()
+        models_list = []
+        for model in models_response.data:
+            models_list.append({
+                "id": model.id,
+                "created": getattr(model, "created", None),
+                "owned_by": getattr(model, "owned_by", "deepinfra")
+            })
+        
+        # Update cache
+        _models_cache = models_list
+        _models_cache_timestamp = current_time
+        
+        return models_list
+    except Exception as e:
+        # If fetch fails and we have cache, return cache
+        if _models_cache is not None:
+            return _models_cache
+        # Otherwise, return empty list
+        return []
+
+
+@app.tool()
+async def list_models(force_refresh: bool = False) -> str:
+    """
+    List all available models from DeepInfra API in real-time.
+    
+    Args:
+        force_refresh: If True, bypass cache and fetch fresh model list. Default is False.
+    
+    Returns:
+        JSON string containing list of available models with their IDs and metadata.
+    """
+    try:
+        models = await get_available_models(force_refresh)
+        return json.dumps({
+            "models": models,
+            "count": len(models),
+            "cached": not force_refresh and _models_cache_timestamp is not None,
+            "cache_age_seconds": int(time.time() - _models_cache_timestamp) if _models_cache_timestamp else 0
+        }, indent=2)
+    except Exception as e:
+        return f"Error fetching models: {type(e).__name__}: {str(e)}"
 
 
 

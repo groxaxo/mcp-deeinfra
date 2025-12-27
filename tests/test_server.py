@@ -26,6 +26,7 @@ class TestServerInitialization:
         # Check that all expected tools are present
         tool_names = {tool["name"] for tool in tools}
         expected_tools = {
+            "list_models",
             "generate_image",
             "text_generation",
             "embeddings",
