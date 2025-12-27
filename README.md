@@ -47,25 +47,25 @@ You can configure which tools are enabled and set default models for each tool u
 
 - `ENABLED_TOOLS`: Comma-separated list of tools to enable. Use "all" to enable all tools (default: "all"). Example: `ENABLED_TOOLS=generate_image,text_generation,embeddings`
 
-- `MODEL_GENERATE_IMAGE`: Default model for image generation (default: "Bria/Bria-3.2")
+- `MODEL_GENERATE_IMAGE`: Default model for image generation (default: "black-forest-labs/FLUX-1-dev")
 
-- `MODEL_TEXT_GENERATION`: Default model for text generation (default: "meta-llama/Llama-2-7b-chat-hf")
+- `MODEL_TEXT_GENERATION`: Default model for text generation (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
-- `MODEL_EMBEDDINGS`: Default model for embeddings (default: "sentence-transformers/all-MiniLM-L6-v2")
+- `MODEL_EMBEDDINGS`: Default model for embeddings (default: "BAAI/bge-large-en-v1.5")
 
 - `MODEL_SPEECH_RECOGNITION`: Default model for speech recognition (default: "openai/whisper-large-v3")
 
-- `MODEL_ZERO_SHOT_IMAGE_CLASSIFICATION`: Default model for zero-shot image classification (default: "openai/gpt-4o-mini")
+- `MODEL_ZERO_SHOT_IMAGE_CLASSIFICATION`: Default model for zero-shot image classification (default: "meta-llama/Llama-3.2-90B-Vision-Instruct")
 
-- `MODEL_OBJECT_DETECTION`: Default model for object detection (default: "openai/gpt-4o-mini")
+- `MODEL_OBJECT_DETECTION`: Default model for object detection (default: "meta-llama/Llama-3.2-90B-Vision-Instruct")
 
-- `MODEL_IMAGE_CLASSIFICATION`: Default model for image classification (default: "openai/gpt-4o-mini")
+- `MODEL_IMAGE_CLASSIFICATION`: Default model for image classification (default: "meta-llama/Llama-3.2-90B-Vision-Instruct")
 
-- `MODEL_TEXT_CLASSIFICATION`: Default model for text classification (default: "microsoft/DialoGPT-medium")
+- `MODEL_TEXT_CLASSIFICATION`: Default model for text classification (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
-- `MODEL_TOKEN_CLASSIFICATION`: Default model for token classification (default: "microsoft/DialoGPT-medium")
+- `MODEL_TOKEN_CLASSIFICATION`: Default model for token classification (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
-- `MODEL_FILL_MASK`: Default model for fill mask (default: "microsoft/DialoGPT-medium")
+- `MODEL_FILL_MASK`: Default model for fill mask (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
 The tools always use the models specified via environment variables. Model selection is configured at startup time through the environment variables listed above.
 
