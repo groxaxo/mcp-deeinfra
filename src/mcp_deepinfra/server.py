@@ -82,6 +82,8 @@ async def get_available_models(force_refresh: bool = False) -> tuple[list[dict],
         return models_list, False
     except Exception as e:
         # If fetch fails and we have cache, return cache
+        # Note: if _models_cache is not None, _models_cache_timestamp should also be set
+        # from a previous successful fetch
         if _models_cache is not None:
             return _models_cache, True
         # Otherwise, return empty list
