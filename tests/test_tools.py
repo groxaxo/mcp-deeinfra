@@ -1,10 +1,53 @@
 """Tests for individual MCP DeepInfra tools."""
 
 import pytest
+import json
 
 
 class TestTools:
     """Test individual MCP tools."""
+
+    def test_list_models(self, mcp_server):
+        """Test list models tool."""
+        response = mcp_server.send_request("tools/call", {
+            "name": "list_models",
+            "arguments": {}
+        })
+
+        # Check response structure
+        assert "result" in response or "error" in response
+
+        if "result" in response:
+            assert "content" in response["result"]
+            content = response["result"]["content"]
+            assert isinstance(content, list)
+            assert len(content) > 0
+            assert content[0]["type"] == "text"
+            result_text = content[0]["text"]
+            
+            # Parse the JSON response
+            result_data = json.loads(result_text)
+            assert "models" in result_data
+            assert "count" in result_data
+            assert isinstance(result_data["models"], list)
+            assert result_data["count"] >= 0
+
+    def test_list_models_force_refresh(self, mcp_server):
+        """Test list models tool with force refresh."""
+        response = mcp_server.send_request("tools/call", {
+            "name": "list_models",
+            "arguments": {
+                "force_refresh": True
+            }
+        })
+
+        assert "result" in response or "error" in response
+
+        if "result" in response:
+            assert "content" in response["result"]
+            content = response["result"]["content"]
+            assert isinstance(content, list)
+            assert len(content) > 0
 
     def test_generate_image(self, mcp_server):
         """Test image generation tool."""

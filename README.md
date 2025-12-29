@@ -1,7 +1,21 @@
-
 # MCP DeepInfra AI Tools Server
 
-This is a Model Context Protocol (MCP) server that provides various AI capabilities using the DeepInfra OpenAI-compatible API, including image generation, text processing, embeddings, speech recognition, and more.
+A powerful Model Context Protocol (MCP) server that provides comprehensive AI capabilities using the DeepInfra OpenAI-compatible API. This server features **real-time model discovery**, allowing you to dynamically access all available models from DeepInfra without manual configuration.
+
+## Features
+
+✨ **Real-Time Model Access** - Automatically discover and use all available DeepInfra models
+🎨 **Image Generation** - Create stunning images from text prompts
+📝 **Text Processing** - Advanced text generation and completion
+🔤 **Embeddings** - Generate vector embeddings for semantic search
+🎙️ **Speech Recognition** - Transcribe audio using Whisper models
+🔍 **Computer Vision** - Image classification, object detection, and zero-shot classification
+🏷️ **Text Analysis** - Sentiment analysis, NER, and text classification
+🎭 **Fill Mask** - Context-aware word prediction
+
+## Acknowledgments
+
+This project builds upon the foundation of the DeepInfra API integration and extends it with dynamic model discovery capabilities. Special thanks to **Vlad J** and all contributors who have helped shape this project.
 
 ## Project Structure
 
@@ -10,15 +24,16 @@ mcp-deepinfra/
 ├── src/
 │   └── mcp_deepinfra/
 │       ├── __init__.py      # Package initialization
-│       └── server.py        # Main MCP server implementation
+│       └── server.py        # Main MCP server implementation with dynamic model discovery
 ├── tests/
 │   ├── conftest.py          # Pytest fixtures and configuration
-│   ├── test_server.py      # Server initialization tests
-│   └── test_tools.py        # Individual tool tests
+│   ├── test_server.py       # Server initialization tests
+│   └── test_tools.py        # Individual tool tests (including list_models)
 ├── pyproject.toml           # Project configuration and dependencies
 ├── uv.lock                  # Lock file for uv package manager
 ├── run_tests.sh             # Convenience script for running tests
-└── README.md               # This file
+├── MODELS.md                # Detailed documentation on dynamic model support
+└── README.md                # This file
 ```
 
 ## Setup
@@ -104,16 +119,49 @@ For Claude Desktop, add to your `claude_desktop_config.json`:
 
 This server provides the following MCP tools:
 
-- `generate_image`: Generate an image from a text prompt. Returns the URL of the generated image.
-- `text_generation`: Generate text completion from a prompt.
-- `embeddings`: Generate embeddings for a list of input texts.
-- `speech_recognition`: Transcribe audio from a URL to text using Whisper model.
-- `zero_shot_image_classification`: Classify an image into provided candidate labels using vision model.
-- `object_detection`: Detect and describe objects in an image using multimodal model.
-- `image_classification`: Classify and describe contents of an image using multimodal model.
-- `text_classification`: Analyze text for sentiment and category.
-- `token_classification`: Perform named entity recognition (NER) on text.
-- `fill_mask`: Fill masked tokens in text with appropriate words.
+### Model Discovery
+- **`list_models`**: Fetch all available models from DeepInfra in real-time. Supports caching with 1-hour TTL and optional force refresh. Returns comprehensive model information including IDs, ownership, and metadata.
+
+### Image Generation
+- **`generate_image`**: Generate an image from a text prompt. Returns the URL of the generated image.
+
+### Text Processing
+- **`text_generation`**: Generate text completion from a prompt.
+- **`text_classification`**: Analyze text for sentiment and category.
+- **`token_classification`**: Perform named entity recognition (NER) on text.
+- **`fill_mask`**: Fill masked tokens in text with appropriate words.
+
+### Embeddings
+- **`embeddings`**: Generate embeddings for a list of input texts.
+
+### Audio Processing
+- **`speech_recognition`**: Transcribe audio from a URL to text using Whisper model.
+
+### Computer Vision
+- **`zero_shot_image_classification`**: Classify an image into provided candidate labels using vision model.
+- **`object_detection`**: Detect and describe objects in an image using multimodal model.
+- **`image_classification`**: Classify and describe contents of an image using multimodal model.
+
+## Dynamic Model Support
+
+The server now features **real-time model discovery**! Use the `list_models` tool to:
+- Get an up-to-date list of all available DeepInfra models
+- View model metadata and capabilities
+- Discover new models as they become available
+- Cache results for better performance (1-hour TTL by default)
+
+Example usage:
+```python
+# List all available models (uses cache if available)
+list_models()
+
+# Force refresh to get the latest models
+list_models(force_refresh=True)
+```
+
+All tools can leverage any compatible model from DeepInfra's extensive catalog by setting the appropriate environment variables.
+
+For detailed information about model discovery and usage, see [MODELS.md](MODELS.md).
 
 ## Testing
 
