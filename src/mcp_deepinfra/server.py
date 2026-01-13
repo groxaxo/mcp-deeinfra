@@ -193,20 +193,40 @@ if "all" in ENABLED_TOOLS or "reranker" in ENABLED_TOOLS:
         """
         model = DEFAULT_MODELS["reranker"]
         try:
+            # Input validation
+            if not documents:
+                return json.dumps({
+                    "error": "Documents list cannot be empty",
+                    "query": query,
+                    "results": []
+                }, indent=2)
+            
+            if top_n is not None and top_n <= 0:
+                return json.dumps({
+                    "error": "top_n must be a positive integer",
+                    "query": query,
+                    "results": []
+                }, indent=2)
+            
             # DeepInfra reranker API endpoint
             async with httpx.AsyncClient(timeout=60.0) as http_client:
+                # Build request payload
+                payload = {
+                    "query": query,
+                    "documents": documents,
+                    "return_documents": True
+                }
+                # Only include top_n if it's specified
+                if top_n is not None:
+                    payload["top_n"] = top_n
+                
                 response = await http_client.post(
                     f"https://api.deepinfra.com/v1/inference/{model}",
                     headers={
                         "Authorization": f"Bearer {DEEPINFRA_API_KEY}",
                         "Content-Type": "application/json"
                     },
-                    json={
-                        "query": query,
-                        "documents": documents,
-                        "top_n": top_n,
-                        "return_documents": True
-                    }
+                    json=payload
                 )
                 response.raise_for_status()
                 result = response.json()
