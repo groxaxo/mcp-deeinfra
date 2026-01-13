@@ -214,10 +214,21 @@ if "all" in ENABLED_TOOLS or "reranker" in ENABLED_TOOLS:
                 # Format the response
                 ranked_results = []
                 for item in result.get("results", []):
+                    # Extract document text safely
+                    doc_index = item.get("index")
+                    document_text = None
+                    
+                    # Try to get document from the item first
+                    if isinstance(item.get("document"), dict):
+                        document_text = item.get("document", {}).get("text")
+                    # Otherwise, get from original documents list using index
+                    elif doc_index is not None and 0 <= doc_index < len(documents):
+                        document_text = documents[doc_index]
+                    
                     ranked_results.append({
-                        "index": item.get("index"),
+                        "index": doc_index,
                         "relevance_score": item.get("relevance_score"),
-                        "document": item.get("document", {}).get("text") if isinstance(item.get("document"), dict) else documents[item.get("index")] if item.get("index") < len(documents) else None
+                        "document": document_text
                     })
                 
                 return json.dumps({
