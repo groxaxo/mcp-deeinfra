@@ -201,12 +201,16 @@ if "all" in ENABLED_TOOLS or "reranker" in ENABLED_TOOLS:
                     "results": []
                 }, indent=2)
             
-            if top_n is not None and top_n <= 0:
-                return json.dumps({
-                    "error": "top_n must be a positive integer",
-                    "query": query,
-                    "results": []
-                }, indent=2)
+            if top_n is not None:
+                if top_n <= 0:
+                    return json.dumps({
+                        "error": "top_n must be a positive integer",
+                        "query": query,
+                        "results": []
+                    }, indent=2)
+                # Cap top_n to the number of documents available
+                if top_n > len(documents):
+                    top_n = len(documents)
             
             # DeepInfra reranker API endpoint
             async with httpx.AsyncClient(timeout=60.0) as http_client:
