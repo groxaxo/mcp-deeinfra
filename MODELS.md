@@ -1,15 +1,29 @@
 # Dynamic Model Support
 
-The MCP DeepInfra server now features **real-time model discovery**, enabling you to dynamically access all available models from DeepInfra without manual configuration.
+The MCP DeepInfra server now features **real-time model discovery** and **automatic updates**, enabling you to dynamically access all available models from DeepInfra without manual configuration.
 
 ## Overview
 
 The server automatically fetches and caches the list of available models from the DeepInfra API, allowing you to:
 
-- 🔄 Access all current models in real-time
-- 🚀 Discover new models as they become available
+- 🔄 Access all current models in real-time with automatic server-side updates
+- 🚀 Discover new models as they become available on DeepInfra
 - ⚡ Benefit from intelligent caching (1-hour TTL)
 - 🔍 Query model metadata and capabilities
+- 🏠 Self-host with zero maintenance for model updates
+
+## Self-Hosting and Auto-Updates
+
+**Self-Hostable:** This server can run anywhere with:
+- Python 3.10 or higher
+- A DeepInfra API key
+- Internet access to DeepInfra's API endpoints
+
+**Auto-Updates:** DeepInfra handles all model updates server-side:
+- New models are immediately available via API
+- Model improvements and updates are automatic
+- No manual intervention or downloads required
+- Use `list_models(force_refresh=True)` to bypass cache and get the latest model list
 
 ## Using the list_models Tool
 
@@ -96,6 +110,33 @@ Once you've discovered available models, you can configure any tool to use them 
    # This will now use Mixtral-8x7B-Instruct
    ```
 
+### Example: Using Reranker
+
+1. **Discover available reranker models**:
+   ```python
+   models = list_models()
+   # Find reranker models like "Qwen/Qwen3-Reranker-4B"
+   ```
+
+2. **Configure the reranker** in your `.env` file:
+   ```bash
+   MODEL_RERANKER=Qwen/Qwen3-Reranker-4B
+   ```
+
+3. **Use the reranker** to rank documents:
+   ```python
+   reranker(
+       query="What is the capital of France?",
+       documents=[
+           "Paris is the capital of France.",
+           "London is the capital of the United Kingdom.",
+           "Berlin is the capital of Germany."
+       ],
+       top_n=3
+   )
+   # Returns documents ranked by relevance to the query
+   ```
+
 ## Model Categories
 
 DeepInfra provides models across various categories:
@@ -112,9 +153,14 @@ DeepInfra provides models across various categories:
 - And more...
 
 ### Embeddings
-- BGE models
+- BAAI models (bge-large, bge-base)
 - E5 models
 - Custom embedding models
+
+### Rerankers
+- Qwen3-Reranker-0.6B (lightweight, efficient)
+- Qwen3-Reranker-4B (balanced performance)
+- Qwen3-Reranker-8B (best-in-class accuracy)
 
 ### Vision Models
 - LLaMA Vision

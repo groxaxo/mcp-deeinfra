@@ -103,6 +103,32 @@ class TestTools:
         # Embeddings might fail due to model availability, but structure should be correct
         assert "result" in response or "error" in response
 
+    def test_reranker(self, mcp_server):
+        """Test reranker tool."""
+        response = mcp_server.send_request("tools/call", {
+            "name": "reranker",
+            "arguments": {
+                "query": "What is the capital of France?",
+                "documents": [
+                    "Paris is the capital of France.",
+                    "London is the capital of the United Kingdom.",
+                    "Berlin is the capital of Germany.",
+                    "Madrid is the capital of Spain."
+                ],
+                "top_n": 3
+            }
+        })
+
+        # Reranker might fail due to model availability, but structure should be correct
+        assert "result" in response or "error" in response
+
+        if "result" in response:
+            assert "content" in response["result"]
+            content = response["result"]["content"]
+            assert isinstance(content, list)
+            assert len(content) > 0
+            assert content[0]["type"] == "text"
+
     def test_speech_recognition(self, mcp_server):
         """Test speech recognition tool."""
         response = mcp_server.send_request("tools/call", {

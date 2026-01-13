@@ -1,17 +1,35 @@
 # MCP DeepInfra AI Tools Server
 
-A powerful Model Context Protocol (MCP) server that provides comprehensive AI capabilities using the DeepInfra OpenAI-compatible API. This server features **real-time model discovery**, allowing you to dynamically access all available models from DeepInfra without manual configuration.
+A powerful Model Context Protocol (MCP) server that provides comprehensive AI capabilities using the DeepInfra OpenAI-compatible API. This server features **real-time model discovery** and **automatic model updates**, allowing you to dynamically access all available models from DeepInfra without manual configuration.
 
 ## Features
 
 ✨ **Real-Time Model Access** - Automatically discover and use all available DeepInfra models
+🚀 **Auto-Updated Models** - Models are automatically updated server-side by DeepInfra
+🏠 **Self-Hostable** - Run anywhere with Python 3.10+ and a DeepInfra API key
 🎨 **Image Generation** - Create stunning images from text prompts
 📝 **Text Processing** - Advanced text generation and completion
 🔤 **Embeddings** - Generate vector embeddings for semantic search
+🔄 **Reranking** - Rerank documents by relevance using state-of-the-art reranker models
 🎙️ **Speech Recognition** - Transcribe audio using Whisper models
 🔍 **Computer Vision** - Image classification, object detection, and zero-shot classification
 🏷️ **Text Analysis** - Sentiment analysis, NER, and text classification
 🎭 **Fill Mask** - Context-aware word prediction
+
+## Self-Hosting and Auto-Updates
+
+This MCP server is designed to be **fully self-hostable** and requires only:
+- Python 3.10 or higher
+- A DeepInfra API key (free tier available)
+- Network access to DeepInfra's API
+
+**Auto-Updates:** All models are hosted and updated by DeepInfra server-side. When DeepInfra adds or updates models:
+- New models become immediately available through the API
+- The `list_models` tool discovers them automatically (with 1-hour cache)
+- No manual updates or downloads required
+- Use `force_refresh=True` to immediately discover new models
+
+This ensures you always have access to the latest models without any maintenance overhead.
 
 ## Acknowledgments
 
@@ -67,6 +85,8 @@ You can configure which tools are enabled and set default models for each tool u
 - `MODEL_TEXT_GENERATION`: Default model for text generation (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
 - `MODEL_EMBEDDINGS`: Default model for embeddings (default: "BAAI/bge-large-en-v1.5")
+
+- `MODEL_RERANKER`: Default model for reranking (default: "Qwen/Qwen3-Reranker-4B")
 
 - `MODEL_SPEECH_RECOGNITION`: Default model for speech recognition (default: "openai/whisper-large-v3")
 
@@ -133,6 +153,9 @@ This server provides the following MCP tools:
 
 ### Embeddings
 - **`embeddings`**: Generate embeddings for a list of input texts.
+
+### Reranking
+- **`reranker`**: Rerank a list of documents based on their relevance to a query. Returns ranked results with relevance scores.
 
 ### Audio Processing
 - **`speech_recognition`**: Transcribe audio from a URL to text using Whisper model.

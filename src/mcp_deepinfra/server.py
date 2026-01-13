@@ -38,6 +38,7 @@ DEFAULT_MODELS = {
     "generate_image": os.getenv("MODEL_GENERATE_IMAGE", "black-forest-labs/FLUX-1-dev"),
     "text_generation": os.getenv("MODEL_TEXT_GENERATION", "meta-llama/Meta-Llama-3.3-70B-Instruct"),
     "embeddings": os.getenv("MODEL_EMBEDDINGS", "BAAI/bge-large-en-v1.5"),
+    "reranker": os.getenv("MODEL_RERANKER", "Qwen/Qwen3-Reranker-4B"),
     "speech_recognition": os.getenv("MODEL_SPEECH_RECOGNITION", "openai/whisper-large-v3"),
     "zero_shot_image_classification": os.getenv("MODEL_ZERO_SHOT_IMAGE_CLASSIFICATION", "meta-llama/Llama-3.2-90B-Vision-Instruct"),
     "object_detection": os.getenv("MODEL_OBJECT_DETECTION", "meta-llama/Llama-3.2-90B-Vision-Instruct"),
@@ -176,6 +177,92 @@ if "all" in ENABLED_TOOLS or "embeddings" in ENABLED_TOOLS:
             return str(embeddings_list)
         except Exception as e:
             return f"Error generating embeddings: {type(e).__name__}: {str(e)}"
+
+if "all" in ENABLED_TOOLS or "reranker" in ENABLED_TOOLS:
+    @app.tool()
+    async def reranker(query: str, documents: list[str], top_n: int | None = None) -> str:
+        """Rerank documents based on relevance to a query using DeepInfra reranker models.
+        
+        Args:
+            query: The search query to rank documents against
+            documents: List of documents to rerank
+            top_n: Optional number of top results to return. If None, returns all documents ranked.
+        
+        Returns:
+            JSON string with ranked documents, including original index, relevance score, and text.
+        """
+        model = DEFAULT_MODELS["reranker"]
+        try:
+            # Input validation
+            if not documents:
+                return json.dumps({
+                    "error": "Documents list cannot be empty",
+                    "query": query,
+                    "results": []
+                }, indent=2)
+            
+            if top_n is not None:
+                if top_n <= 0:
+                    return json.dumps({
+                        "error": "top_n must be a positive integer",
+                        "query": query,
+                        "results": []
+                    }, indent=2)
+                # Cap top_n to the number of documents available
+                if top_n > len(documents):
+                    top_n = len(documents)
+            
+            # DeepInfra reranker API endpoint
+            async with httpx.AsyncClient(timeout=60.0) as http_client:
+                # Build request payload
+                payload = {
+                    "query": query,
+                    "documents": documents,
+                    "return_documents": True
+                }
+                # Only include top_n if it's specified
+                if top_n is not None:
+                    payload["top_n"] = top_n
+                
+                response = await http_client.post(
+                    f"https://api.deepinfra.com/v1/inference/{model}",
+                    headers={
+                        "Authorization": f"Bearer {DEEPINFRA_API_KEY}",
+                        "Content-Type": "application/json"
+                    },
+                    json=payload
+                )
+                response.raise_for_status()
+                result = response.json()
+                
+                # Format the response
+                ranked_results = []
+                for item in result.get("results", []):
+                    # Extract document text safely
+                    doc_index = item.get("index")
+                    document_text = None
+                    
+                    # Try to get document from the item first
+                    doc_obj = item.get("document")
+                    if isinstance(doc_obj, dict):
+                        document_text = doc_obj.get("text")
+                    # Otherwise, get from original documents list using index
+                    elif doc_index is not None and 0 <= doc_index < len(documents):
+                        document_text = documents[doc_index]
+                    
+                    ranked_results.append({
+                        "index": doc_index,
+                        "relevance_score": item.get("relevance_score"),
+                        "document": document_text
+                    })
+                
+                return json.dumps({
+                    "query": query,
+                    "results": ranked_results,
+                    "model": model
+                }, indent=2)
+        except Exception as e:
+            return f"Error reranking documents: {type(e).__name__}: {str(e)}"
 
 if "all" in ENABLED_TOOLS or "speech_recognition" in ENABLED_TOOLS:
     @app.tool()
