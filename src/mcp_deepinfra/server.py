@@ -219,8 +219,9 @@ if "all" in ENABLED_TOOLS or "reranker" in ENABLED_TOOLS:
                     document_text = None
                     
                     # Try to get document from the item first
-                    if isinstance(item.get("document"), dict):
-                        document_text = item.get("document", {}).get("text")
+                    doc_obj = item.get("document")
+                    if isinstance(doc_obj, dict):
+                        document_text = doc_obj.get("text")
                     # Otherwise, get from original documents list using index
                     elif doc_index is not None and 0 <= doc_index < len(documents):
                         document_text = documents[doc_index]
