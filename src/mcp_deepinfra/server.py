@@ -180,7 +180,7 @@ if "all" in ENABLED_TOOLS or "embeddings" in ENABLED_TOOLS:
 
 if "all" in ENABLED_TOOLS or "reranker" in ENABLED_TOOLS:
     @app.tool()
-    async def reranker(query: str, documents: list[str], top_n: int = None) -> str:
+    async def reranker(query: str, documents: list[str], top_n: int | None = None) -> str:
         """Rerank documents based on relevance to a query using DeepInfra reranker models.
         
         Args:
