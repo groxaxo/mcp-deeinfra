@@ -8,6 +8,7 @@ A powerful Model Context Protocol (MCP) server that provides comprehensive AI ca
 🎨 **Image Generation** - Create stunning images from text prompts
 📝 **Text Processing** - Advanced text generation and completion
 🔤 **Embeddings** - Generate vector embeddings for semantic search
+🔄 **Reranking** - Rerank documents by relevance using state-of-the-art reranker models
 🎙️ **Speech Recognition** - Transcribe audio using Whisper models
 🔍 **Computer Vision** - Image classification, object detection, and zero-shot classification
 🏷️ **Text Analysis** - Sentiment analysis, NER, and text classification
@@ -67,6 +68,8 @@ You can configure which tools are enabled and set default models for each tool u
 - `MODEL_TEXT_GENERATION`: Default model for text generation (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
 - `MODEL_EMBEDDINGS`: Default model for embeddings (default: "BAAI/bge-large-en-v1.5")
+
+- `MODEL_RERANKER`: Default model for reranking (default: "Qwen/Qwen3-Reranker-4B")
 
 - `MODEL_SPEECH_RECOGNITION`: Default model for speech recognition (default: "openai/whisper-large-v3")
 
@@ -133,6 +136,9 @@ This server provides the following MCP tools:
 
 ### Embeddings
 - **`embeddings`**: Generate embeddings for a list of input texts.
+
+### Reranking
+- **`reranker`**: Rerank a list of documents based on their relevance to a query. Returns ranked results with relevance scores.
 
 ### Audio Processing
 - **`speech_recognition`**: Transcribe audio from a URL to text using Whisper model.

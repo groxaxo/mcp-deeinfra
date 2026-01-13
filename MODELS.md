@@ -96,6 +96,33 @@ Once you've discovered available models, you can configure any tool to use them 
    # This will now use Mixtral-8x7B-Instruct
    ```
 
+### Example: Using Reranker
+
+1. **Discover available reranker models**:
+   ```python
+   models = list_models()
+   # Find reranker models like "Qwen/Qwen3-Reranker-4B"
+   ```
+
+2. **Configure the reranker** in your `.env` file:
+   ```bash
+   MODEL_RERANKER=Qwen/Qwen3-Reranker-4B
+   ```
+
+3. **Use the reranker** to rank documents:
+   ```python
+   reranker(
+       query="What is the capital of France?",
+       documents=[
+           "Paris is the capital of France.",
+           "London is the capital of the United Kingdom.",
+           "Berlin is the capital of Germany."
+       ],
+       top_n=3
+   )
+   # Returns documents ranked by relevance to the query
+   ```
+
 ## Model Categories
 
 DeepInfra provides models across various categories:
@@ -112,9 +139,14 @@ DeepInfra provides models across various categories:
 - And more...
 
 ### Embeddings
-- BGE models
+- BAAI models (bge-large, bge-base)
 - E5 models
 - Custom embedding models
+
+### Rerankers
+- Qwen3-Reranker-0.6B (lightweight, efficient)
+- Qwen3-Reranker-4B (balanced performance)
+- Qwen3-Reranker-8B (best-in-class accuracy)
 
 ### Vision Models
 - LLaMA Vision

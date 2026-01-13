@@ -30,6 +30,7 @@ class TestServerInitialization:
             "generate_image",
             "text_generation",
             "embeddings",
+            "reranker",
             "speech_recognition",
             "zero_shot_image_classification",
             "object_detection",
