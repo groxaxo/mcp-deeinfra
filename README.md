@@ -1,10 +1,12 @@
 # MCP DeepInfra AI Tools Server
 
-A powerful Model Context Protocol (MCP) server that provides comprehensive AI capabilities using the DeepInfra OpenAI-compatible API. This server features **real-time model discovery**, allowing you to dynamically access all available models from DeepInfra without manual configuration.
+A powerful Model Context Protocol (MCP) server that provides comprehensive AI capabilities using the DeepInfra OpenAI-compatible API. This server features **real-time model discovery** and **automatic model updates**, allowing you to dynamically access all available models from DeepInfra without manual configuration.
 
 ## Features
 
 ✨ **Real-Time Model Access** - Automatically discover and use all available DeepInfra models
+🚀 **Auto-Updated Models** - Models are automatically updated server-side by DeepInfra
+🏠 **Self-Hostable** - Run anywhere with Python 3.10+ and a DeepInfra API key
 🎨 **Image Generation** - Create stunning images from text prompts
 📝 **Text Processing** - Advanced text generation and completion
 🔤 **Embeddings** - Generate vector embeddings for semantic search
@@ -13,6 +15,21 @@ A powerful Model Context Protocol (MCP) server that provides comprehensive AI ca
 🔍 **Computer Vision** - Image classification, object detection, and zero-shot classification
 🏷️ **Text Analysis** - Sentiment analysis, NER, and text classification
 🎭 **Fill Mask** - Context-aware word prediction
+
+## Self-Hosting and Auto-Updates
+
+This MCP server is designed to be **fully self-hostable** and requires only:
+- Python 3.10 or higher
+- A DeepInfra API key (free tier available)
+- Network access to DeepInfra's API
+
+**Auto-Updates:** All models are hosted and updated by DeepInfra server-side. When DeepInfra adds or updates models:
+- New models become immediately available through the API
+- The `list_models` tool discovers them automatically (with 1-hour cache)
+- No manual updates or downloads required
+- Use `force_refresh=True` to immediately discover new models
+
+This ensures you always have access to the latest models without any maintenance overhead.
 
 ## Acknowledgments
 
