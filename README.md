@@ -74,12 +74,20 @@ mcp-deepinfra/
 
 4. **Set up your DeepInfra API key**:
    
-   Create a `.env` file in the project root with your API key:
+   Copy the example configuration and add your API key:
    ```bash
-   DEEPINFRA_API_KEY=your_api_key_here
+   cp .env.example .env
+   # Then edit .env and replace 'your_api_key_here' with your actual API key
+   ```
+   
+   Or create a `.env` file directly:
+   ```bash
+   echo "DEEPINFRA_API_KEY=your_api_key_here" > .env
    ```
    
    That's it! The server comes pre-configured with sensible default models for all tools.
+   
+   **Get your free API key:** Sign up at [DeepInfra](https://deepinfra.com/)
 
 ## Configuration
 
