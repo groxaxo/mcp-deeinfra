@@ -89,9 +89,11 @@ To optimize performance and reduce API calls, the server implements intelligent 
 
 ## Using Models with Tools
 
-Once you've discovered available models, you can configure any tool to use them via environment variables:
+**All tools come with pre-configured default models**, so you can use them immediately without any additional configuration.
 
-### Example: Using a Discovered Model
+If you want to use a different model, you can customize it via environment variables:
+
+### Example: Customizing the Text Generation Model (Optional)
 
 1. **Discover available models**:
    ```python
@@ -101,29 +103,48 @@ Once you've discovered available models, you can configure any tool to use them 
 
 2. **Configure the tool** in your `.env` file:
    ```bash
+   DEEPINFRA_API_KEY=your_api_key_here
    MODEL_TEXT_GENERATION=mistralai/Mixtral-8x7B-Instruct-v0.1
    ```
 
 3. **Use the tool** with your chosen model:
    ```python
    text_generation(prompt="Hello, how are you?")
-   # This will now use Mixtral-8x7B-Instruct
+   # This will now use Mixtral-8x7B-Instruct instead of the default
    ```
 
-### Example: Using Reranker
+### Example: Customizing the Reranker Model (Optional)
+
+The reranker tool comes pre-configured with Qwen/Qwen3-Reranker-4B. To use it:
+
+```python
+reranker(
+    query="What is the capital of France?",
+    documents=[
+        "Paris is the capital of France.",
+        "London is the capital of the United Kingdom.",
+        "Berlin is the capital of Germany."
+    ],
+    top_n=3
+)
+# Returns documents ranked by relevance to the query
+```
+
+If you want to use a different reranker model:
 
 1. **Discover available reranker models**:
    ```python
    models = list_models()
-   # Find reranker models like "Qwen/Qwen3-Reranker-4B"
+   # Find reranker models like "Qwen/Qwen3-Reranker-8B"
    ```
 
 2. **Configure the reranker** in your `.env` file:
    ```bash
-   MODEL_RERANKER=Qwen/Qwen3-Reranker-4B
+   DEEPINFRA_API_KEY=your_api_key_here
+   MODEL_RERANKER=Qwen/Qwen3-Reranker-8B
    ```
 
-3. **Use the reranker** to rank documents:
+3. **Use the reranker** as usual:
    ```python
    reranker(
        query="What is the capital of France?",
@@ -199,24 +220,44 @@ The server gracefully handles various error scenarios:
 
 ## Integration Examples
 
-### With Claude Desktop
+### With Claude Desktop - Minimal Configuration
 
 ```json
 {
   "mcpServers": {
     "deepinfra": {
       "command": "uv",
-      "args": ["run", "mcp_deepinfra"],
+      "args": ["--directory", "/path/to/mcp-deeinfra", "run", "mcp_deepinfra"],
       "env": {
-        "DEEPINFRA_API_KEY": "your_api_key_here",
-        "MODEL_TEXT_GENERATION": "meta-llama/Meta-Llama-3.3-70B-Instruct"
+        "DEEPINFRA_API_KEY": "your_api_key_here"
       }
     }
   }
 }
 ```
 
-First, use `list_models()` to discover available models, then configure your preferred model via the `MODEL_*` environment variables.
+This minimal configuration is all you need - all tools will use their pre-configured default models.
+
+### With Claude Desktop - Custom Models (Optional)
+
+If you want to override default models:
+
+```json
+{
+  "mcpServers": {
+    "deepinfra": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/mcp-deeinfra", "run", "mcp_deepinfra"],
+      "env": {
+        "DEEPINFRA_API_KEY": "your_api_key_here",
+        "MODEL_TEXT_GENERATION": "mistralai/Mixtral-8x7B-Instruct-v0.1"
+      }
+    }
+  }
+}
+```
+
+Use `list_models()` to discover available models, then configure your preferred models via the `MODEL_*` environment variables as needed.
 
 ## Troubleshooting
 
