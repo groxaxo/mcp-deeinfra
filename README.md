@@ -54,31 +54,51 @@ mcp-deepinfra/
 └── README.md                # This file
 ```
 
-## Setup
+## Quick Start
 
-1. Install uv if not already installed:
+1. **Install uv** (if not already installed):
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-2. Clone or download this repository.
+2. **Clone this repository**:
+   ```bash
+   git clone https://github.com/groxaxo/mcp-deeinfra.git
+   cd mcp-deeinfra
+   ```
 
-3. Install dependencies:
+3. **Install dependencies**:
    ```bash
    uv sync
    ```
 
-4. Set up your DeepInfra API key:
-   Create a `.env` file in the project root:
+4. **Set up your DeepInfra API key**:
+   
+   Copy the example configuration and add your API key:
+   ```bash
+   cp .env.example .env
+   # Then edit .env and replace 'your_api_key_here' with your actual API key
    ```
-   DEEPINFRA_API_KEY=your_api_key_here
+   
+   Or create a `.env` file directly:
+   ```bash
+   echo "DEEPINFRA_API_KEY=your_api_key_here" > .env
    ```
+   
+   That's it! The server comes pre-configured with sensible default models for all tools.
+   
+   **Get your free API key:** Sign up at [DeepInfra](https://deepinfra.com/)
 
 ## Configuration
 
-You can configure which tools are enabled and set default models for each tool using environment variables in your `.env` file:
+**All tools work out of the box** with pre-configured default models. You only need to set your `DEEPINFRA_API_KEY`.
 
-- `ENABLED_TOOLS`: Comma-separated list of tools to enable. Use "all" to enable all tools (default: "all"). Example: `ENABLED_TOOLS=generate_image,text_generation,embeddings`
+### Advanced Configuration (Optional)
+
+If you want to customize the default models or enabled tools, you can add these environment variables to your `.env` file:
+
+- `ENABLED_TOOLS`: Comma-separated list of tools to enable (default: "all")
+  - Example: `ENABLED_TOOLS=generate_image,text_generation,embeddings`
 
 - `MODEL_GENERATE_IMAGE`: Default model for image generation (default: "black-forest-labs/FLUX-1-dev")
 
@@ -102,7 +122,7 @@ You can configure which tools are enabled and set default models for each tool u
 
 - `MODEL_FILL_MASK`: Default model for fill mask (default: "meta-llama/Meta-Llama-3.3-70B-Instruct")
 
-The tools always use the models specified via environment variables. Model selection is configured at startup time through the environment variables listed above.
+You can discover available models using the `list_models` tool and configure any compatible model from DeepInfra's catalog.
 
 ## Running the Server
 
@@ -118,15 +138,16 @@ python -m mcp_deepinfra.server
 
 ## Using with MCP Clients
 
-Configure your MCP client (e.g., Claude Desktop) to use this server.
+### Claude Desktop Setup
 
-For Claude Desktop, add to your `claude_desktop_config.json`:
+Add this to your `claude_desktop_config.json` (typically located in `~/Library/Application Support/Claude/` on macOS or `%APPDATA%\Claude\` on Windows):
+
 ```json
 {
   "mcpServers": {
     "deepinfra": {
       "command": "uv",
-      "args": ["run", "mcp_deepinfra"],
+      "args": ["--directory", "/path/to/mcp-deeinfra", "run", "mcp_deepinfra"],
       "env": {
         "DEEPINFRA_API_KEY": "your_api_key_here"
       }
@@ -134,6 +155,10 @@ For Claude Desktop, add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+**Important:** Replace `/path/to/mcp-deeinfra` with the actual path where you cloned this repository.
+
+**Getting your API key:** Sign up at [DeepInfra](https://deepinfra.com/) to get your free API key.
 
 ## Tools Provided
 
@@ -182,9 +207,9 @@ list_models()
 list_models(force_refresh=True)
 ```
 
-All tools can leverage any compatible model from DeepInfra's extensive catalog by setting the appropriate environment variables.
+All tools come pre-configured with optimal default models. You can optionally customize models by setting environment variables (see Advanced Configuration section above).
 
-For detailed information about model discovery and usage, see [MODELS.md](MODELS.md).
+For detailed information about model discovery and customization, see [MODELS.md](MODELS.md).
 
 ## Testing
 
